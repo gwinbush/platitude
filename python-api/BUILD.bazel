@@ -1,0 +1,36 @@
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_tarball")
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "python_api",
+    srcs = ["app.py"],
+    main = "app.py",
+    deps = [
+        "@pip//flask",
+    ],
+)
+
+# Package the Python app
+pkg_tar(
+    name = "python_api_layer",
+    srcs = [":python_api"],
+    include_runfiles = True,
+    package_dir = "/app",
+)
+
+# Create OCI image
+oci_image(
+    name = "python_api_image",
+    base = "@python_base",
+    entrypoint = ["/app/python_api"],
+    tars = [":python_api_layer"],
+)
+
+# Create tarball for loading into Docker
+oci_tarball(
+    name = "python_api_tarball",
+    image = ":python_api_image",
+    repo_tags = ["python-api:1.0.0"],
+)
+

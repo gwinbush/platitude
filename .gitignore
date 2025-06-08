@@ -1,0 +1,14 @@
+# Bazel
+bazel-bin
+bazel-out
+bazel-testlogs
+bazel-platitude
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+platitude/

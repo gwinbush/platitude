@@ -1,0 +1,31 @@
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_tarball")
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("@rules_go//go:def.bzl", "go_binary")
+
+go_binary(
+    name = "go_api",
+    srcs = ["main.go"],
+    out = "go_api",
+)
+
+pkg_tar(
+    name = "go_api_layer",
+    srcs = [":go_api"],
+    package_dir = "/app",
+    mode = "0755", # Full access to the owner, read + execute access to group and others
+)
+
+# Create OCI image
+oci_image(
+    name = "go_api_image",
+    base = "@go_base",
+    entrypoint = ["/app/go_api"],
+    tars = [":go_api_layer"],
+)
+
+# Create tarball for loading into Docker
+oci_tarball(
+    name = "go_api_tarball",
+    image = ":go_api_image",
+    repo_tags = ["go-api:1.0.0"],
+)

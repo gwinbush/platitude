@@ -1,0 +1,7 @@
+platform(
+    name = "linux_arm_64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+    ],
+)
