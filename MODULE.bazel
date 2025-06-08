@@ -1,0 +1,49 @@
+"""Bazel module configuration for the platitude microservices monorepo."""
+
+module(
+    name = "platitude_monorepo",
+    version = "1.0.0",
+)
+
+# Load dependencies
+bazel_dep(name = "rules_python", version = "0.40.0")
+bazel_dep(name = "rules_go", version = "0.55.0")
+bazel_dep(name = "rules_oci", version = "1.4.0")
+bazel_dep(name = "rules_pkg", version = "1.0.1")
+bazel_dep(name = "platforms", version = "0.0.10")
+
+# Python configuration
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(python_version = "3.11")
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "pip",
+    python_version = "3.11",
+    requirements_lock = "//python-api:requirements.txt",
+)
+use_repo(pip, "pip")
+
+# Go configuration
+go = use_extension("@rules_go//go:extensions.bzl", "go")
+go.toolchain(go_version = "1.24.4")
+use_repo(go)
+
+# OCI configuration
+oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")
+oci.pull(
+    name = "python_base",
+    image = "python:3.11-slim",
+    tag = "sha256:7a3ed1226224bcc1fe5443262363d42f48cf832a540c1836ba8ccbeaadf8637c",
+    platforms = ["linux/arm64/v8"],
+)
+
+oci.pull(
+    name = "go_base",
+    image = "alpine:3.22.0",
+    tag = "sha256:8a1f59ffb675680d47db6337b49d22281a139e9d709335b492be023728e11715",
+    platforms = ["linux/arm64/v8"],
+)
+
+use_repo(oci, "python_base")
+use_repo(oci, "go_base")
