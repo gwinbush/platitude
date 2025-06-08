@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "Building microservices with Bazel..."
-
-
 # Deploy to Kubernetes
 echo "Deploying to Kubernetes..."
 kubectl apply -f k8s/python-api.yaml
